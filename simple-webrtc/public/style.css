@@ -479,3 +479,211 @@ button:disabled {
   .btn-row button { width: 100%; justify-content: center; }
   .info-header { flex-direction: column; align-items: flex-start; }
 }
+
+/* ─── Floating Reactions & Reaction Bar ──────────────────────────────────── */
+.reactions-overlay {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  width: 100%;
+  height: 100%;
+  pointer-events: none;
+  overflow: hidden;
+  z-index: 100;
+}
+
+.floating-reaction {
+  position: absolute;
+  bottom: 25px;
+  font-size: 3.5rem;
+  line-height: 1;
+  user-select: none;
+  pointer-events: none;
+  will-change: transform, opacity;
+  animation: floatReaction 3.4s cubic-bezier(0.15, 0.85, 0.35, 1) forwards;
+  filter: drop-shadow(0 6px 18px rgba(0, 0, 0, 0.95)) drop-shadow(0 0 12px rgba(255, 102, 0, 0.35));
+  z-index: 999;
+  opacity: 1;
+}
+
+@keyframes floatReaction {
+  0% {
+    opacity: 1;
+    transform: translateY(0) scale(0.7) rotate(0deg);
+  }
+  15% {
+    opacity: 1;
+    transform: translateY(-60px) scale(1.4) rotate(var(--rot, -10deg));
+  }
+  50% {
+    opacity: 1;
+    transform: translateY(-200px) translateX(var(--drift, 20px)) scale(1.2) rotate(var(--rot, 10deg));
+  }
+  80% {
+    opacity: 0.95;
+    transform: translateY(-340px) translateX(calc(0px - var(--drift, 20px))) scale(1.05) rotate(var(--rot, -5deg));
+  }
+  100% {
+    opacity: 0;
+    transform: translateY(-490px) translateX(0px) scale(0.75) rotate(0deg);
+  }
+}
+
+.reactions-bar {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.45rem;
+  background: var(--c-s1);
+  border: 1px solid var(--c-border-md);
+  padding: 0.35rem 0.75rem;
+  border-radius: 40px;
+  box-shadow: 0 4px 18px rgba(0, 0, 0, 0.35);
+}
+
+.reactions-title {
+  font-size: 0.78rem;
+  font-weight: 700;
+  color: var(--txt-2);
+  margin-right: 0.25rem;
+  display: flex;
+  align-items: center;
+  gap: 0.35rem;
+}
+
+.reaction-btn {
+  background: rgba(255, 255, 255, 0.04);
+  border: 1px solid var(--c-border);
+  border-radius: 50%;
+  width: 40px;
+  height: 40px;
+  font-size: 1.35rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  transition: transform 0.2s cubic-bezier(0.175, 0.885, 0.32, 1.275), background 0.18s, border-color 0.18s, box-shadow 0.18s;
+  padding: 0;
+}
+
+.reaction-btn:hover {
+  transform: scale(1.28) translateY(-3px);
+  background: rgba(255, 102, 0, 0.2);
+  border-color: var(--fire-o);
+  box-shadow: 0 0 16px rgba(255, 102, 0, 0.5);
+}
+
+.reaction-btn:active, .reaction-btn.pop {
+  transform: scale(1.4) translateY(-5px);
+}
+
+/* ─── Screen Sharing & Source Switch Controls ────────────────────────────── */
+.source-switch-group {
+  display: inline-flex;
+  align-items: center;
+  background: var(--c-s1);
+  border: 1px solid var(--c-border-md);
+  border-radius: var(--r-md);
+  padding: 3px;
+  gap: 3px;
+}
+
+.source-btn {
+  background: transparent;
+  color: var(--txt-2);
+  border: none;
+  padding: 0.48rem 0.9rem;
+  font-size: 0.82rem;
+  font-weight: 700;
+  border-radius: calc(var(--r-md) - 3px);
+  cursor: pointer;
+  display: inline-flex;
+  align-items: center;
+  gap: 0.45rem;
+  transition: all 0.2s var(--ease);
+}
+
+.source-btn svg {
+  width: 15px;
+  height: 15px;
+}
+
+.source-btn:hover:not(:disabled) {
+  color: var(--txt-1);
+  background: var(--c-s2);
+}
+
+.source-btn.active {
+  background: var(--fire-bg);
+  color: var(--fire-o);
+  border: 1px solid rgba(255, 102, 0, 0.35);
+  box-shadow: 0 0 12px rgba(255, 102, 0, 0.25);
+}
+
+.source-btn:disabled {
+  opacity: 0.4;
+  cursor: not-allowed;
+}
+
+#screenShareBtn {
+  background: rgba(59, 130, 246, 0.15);
+  color: #60a5fa;
+  border: 1px solid rgba(59, 130, 246, 0.35);
+}
+
+#screenShareBtn:hover:not(:disabled) {
+  background: rgba(59, 130, 246, 0.28);
+  border-color: #60a5fa;
+  color: #fff;
+  box-shadow: 0 0 16px rgba(59, 130, 246, 0.35);
+}
+
+#screenShareBtn.is-sharing {
+  background: rgba(239, 68, 68, 0.15);
+  color: #f87171;
+  border-color: rgba(239, 68, 68, 0.35);
+}
+
+#screenShareBtn.is-sharing:hover:not(:disabled) {
+  background: rgba(239, 68, 68, 0.28);
+  border-color: #ef4444;
+  color: #fff;
+  box-shadow: 0 0 16px rgba(239, 68, 68, 0.35);
+}
+
+/* ─── HUD Source Badge ───────────────────────────────────────────────────── */
+.badge-source {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.4rem;
+  background: rgba(20, 22, 34, 0.85);
+  backdrop-filter: blur(10px);
+  color: var(--txt-1);
+  font-size: 0.7rem;
+  font-weight: 700;
+  padding: 3px 9px;
+  border-radius: 4px;
+  border: 1px solid var(--c-border);
+  letter-spacing: 0.04em;
+  transition: all 0.25s var(--ease);
+}
+
+.badge-source.screen {
+  border-color: rgba(96, 165, 250, 0.5);
+  color: #93c5fd;
+  box-shadow: 0 0 12px rgba(59, 130, 246, 0.3);
+}
+
+.badge-source.camera {
+  border-color: rgba(16, 185, 129, 0.5);
+  color: #6ee7b7;
+}
+
+.badge-source-dot {
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background: currentColor;
+}
+

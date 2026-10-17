@@ -48,9 +48,10 @@
         </div>
         <!-- REQUIRED: no modificar id -->
         <video id="remoteVideo" autoplay playsinline></video>
+        <div class="reactions-overlay" id="viewerReactionsOverlay"></div>
       </div>
 
-      <!-- Controles -->
+      <!-- Controles y Reacciones en Vivo -->
       <div class="controls-card">
         <div class="btn-row">
           <!-- REQUIRED: no modificar id -->
@@ -63,6 +64,20 @@
             Desconectar
           </button>
         </div>
+
+        <!-- Barra de Reacciones en Tiempo Real -->
+        <div class="reactions-bar" id="reactionsBar" title="Reaccionar en vivo">
+          <span class="reactions-title">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="var(--fire-o)"><path d="M12 21.35l-1.45-1.32C5.4 15.36 2 12.28 2 8.5 2 5.42 4.42 3 7.5 3c1.74 0 3.41.81 4.5 2.09C13.09 3.81 14.76 3 16.5 3 19.58 3 22 5.42 22 8.5c0 3.78-3.4 6.86-8.55 11.54L12 21.35z"/></svg>
+            Reacciones:
+          </span>
+          <button type="button" class="reaction-btn" data-reaction="❤️" title="Me encanta (❤️)">❤️</button>
+          <button type="button" class="reaction-btn" data-reaction="👍" title="Me gusta (👍)">👍</button>
+          <button type="button" class="reaction-btn" data-reaction="😂" title="Me divierte (😂)">😂</button>
+          <button type="button" class="reaction-btn" data-reaction="😮" title="Me asombra (😮)">😮</button>
+          <button type="button" class="reaction-btn" data-reaction="🔥" title="Fuego / Épico (🔥)">🔥</button>
+        </div>
+
         <div class="stat-pill">
           <svg viewBox="0 0 24 24" fill="none" stroke="var(--fire-o)" stroke-width="2" width="14" height="14">
             <path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/>
@@ -132,22 +147,33 @@
   <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-database-compat.js"></script>
   <script src="/firebase-config.js"></script>
   <!-- REQUIRED: la lógica WebRTC original sin modificar -->
+  <script src="/chat.js"></script>
+  <script src="/reactions.js"></script>
   <script src="/receptor/receptor.js"></script>
 
   <script>
     /* ── HUD sync (sin tocar receptor.js) ───────────────────────────────── */
-    const statusEl = document.getElementById('status');
-    const liveTag  = document.getElementById('viewerLiveTag');
-    const offTag   = document.getElementById('viewerOffTag');
+    const statusNode = document.getElementById('status');
+    const liveTag    = document.getElementById('viewerLiveTag');
+    const offTag     = document.getElementById('viewerOffTag');
     const chatLiveBadge = document.getElementById('chatLiveBadge');
 
-    new MutationObserver(() => {
-      const t = statusEl.textContent || '';
-      const live = t.includes('Conectado') || t.includes('Recibiendo');
-      liveTag.style.display = live ? 'inline-flex' : 'none';
-      offTag.style.display  = live ? 'none' : 'inline-flex';
-      chatLiveBadge.style.display = live ? 'inline-flex' : 'none';
-    }).observe(statusEl, { childList: true, characterData: true, subtree: true });
+    if (statusNode) {
+      new MutationObserver(() => {
+        const t = statusNode.textContent || '';
+        const live = t.includes('Conectado') || t.includes('Recibiendo');
+        if (liveTag) liveTag.style.display = live ? 'inline-flex' : 'none';
+        if (offTag) offTag.style.display   = live ? 'none' : 'inline-flex';
+        if (chatLiveBadge) chatLiveBadge.style.display = live ? 'inline-flex' : 'none';
+      }).observe(statusNode, { childList: true, characterData: true, subtree: true });
+    }
+
+    /* ── Floating Reactions (sincronizadas en tiempo real) ──────────────── */
+    const reactions = new FireReactions(ROOM_PATH, {
+      container: document.querySelector('.video-stage')
+    });
+    window.reactions = reactions;
+    reactions.attachReactionButtons('#reactionsBar');
 
     /* ── Chat via Firebase RTDB ──────────────────────────────────────────── */
     const chatRef      = db.ref(ROOM_PATH + '/chat');
